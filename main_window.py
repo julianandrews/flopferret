@@ -151,7 +151,17 @@ class RangeValidator(QtGui.QValidator):
                     new_str = matches[0][1]
                     s = s.replace("#{}#".format(tag), new_str)
                     pos = len(s)
-            return [QtGui.QValidator.Acceptable, s, pos]
+            # fix case of tokens
+            in_tag = False
+            new_s = ""
+            for c in s:
+                if c == '#':
+                    # a parseable string always has properly completed tags
+                    in_tag = not in_tag
+                if not in_tag and c in ''.join(range_string.ranks).lower():
+                    c = c.upper()
+                new_s += c
+            return [QtGui.QValidator.Acceptable, new_s, pos]
         else:
             # accept any input as intermediate 
             return [QtGui.QValidator.Intermediate, s, pos]
@@ -159,7 +169,7 @@ class RangeValidator(QtGui.QValidator):
 class BoardValidator(QtGui.QRegExpValidator):
     """Validator for board input."""
 
-    _rank_str = ''.join(range_string.ranks)
+    _rank_str = ''.join(range_string.ranks)+''.join(range_string.ranks).lower()
     _suit_str = ''.join(range_string.suits)
     _card_str = "[{}][{}]".format(_rank_str, _suit_str)
     _board_str = "({}( *)?){{3,5}}".format(_card_str)
@@ -181,6 +191,9 @@ class BoardValidator(QtGui.QRegExpValidator):
                 result = QtGui.QValidator.Invalid
             s = " ".join(card_strs)
             new_pos = strip_pos + (strip_pos)/2-1
+            # make ranks upper case
+            for r in range_string.ranks:
+                s = s.replace(r.lower(), r)
         elif result == QtGui.QValidator.Invalid:
             # loosen standard for intermediate matches
             if self._int_re.exactMatch(s):

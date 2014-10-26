@@ -105,8 +105,11 @@ def tokens_to_string(tokens):
         pairs = []
         single_hands = []
         other = []
+        tags = []
         for t in tokens:
-            if t[-1] == 'p':
+            if t[0] == '#':
+                tags.append(t)
+            elif t[-1] == 'p':
                 pairs.append(t[:-1])
             elif len(t) == 4:
                 single_hands.append(t)
@@ -126,7 +129,7 @@ def tokens_to_string(tokens):
                 filt.sort(key=lambda x: ranks.index(x[1]))
                 other_strings += group(filt)
         other_strings.reverse()
-        return ', '.join(pair_strings + other_strings + single_hands)
+        return ', '.join(pair_strings + other_strings + single_hands + tags)
     
     strs = []
     weights = list(set([w for (t, w) in tokens]))
@@ -149,7 +152,9 @@ def validate_string(s):
 def make_parser():
     """Generate the pyparsing parser for hand strings."""
     ranks_str = ''.join(ranks)
+    ranks_str += ranks_str.lower()
     suits_str = ''.join(suits)
+    suits_str += suits_str.lower()
     suitedness = pyparsing.Word("os", exact=1).setName("suitedness")
     card = pyparsing.Word(ranks_str, suits_str, exact=2).setName("card")
     hand = card*2
@@ -202,7 +207,7 @@ def expand_hand_type_group(htg):
         return sorted(map(ranks.index, token[:2]), reverse=True)
    
     if htg[0] == "#":
-        tokens = []
+        tokens = [''.join(htg)]
     elif len(htg) == 1:
         tokens = [normalize_token(htg[0])]
     else:
@@ -249,8 +254,10 @@ def expand_hand_type_group(htg):
     return expanded
 
 def normalize_token(token):
-    if len(token) == 4:
-        rs = map(ranks.index, [token[0], token[2]])
+    if token[0] == '#':
+        normalized = token
+    elif len(token) == 4:
+        rs = map(ranks.index, [token[0].upper(), token[2].upper()])
         suit_ranks = map(suits.index, [token[1], token[3]])
         if rs[0] == rs[1] and suit_ranks[0] == suit_ranks[1]:
             raise RangeStringError("Invalid Token: {}".format(token))
@@ -260,7 +267,8 @@ def normalize_token(token):
         else:
             normalized = token
     else:
-        rs = sorted(map(ranks.index, token[:2]), reverse=True)
+        rs = sorted(map(lambda x: ranks.index(x.upper()), token[:2]), 
+                reverse=True)
         normalized = ''.join(ranks[i] for i in rs) + token_suitedness(token)
     return normalized
 
