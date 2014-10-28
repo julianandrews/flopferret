@@ -239,6 +239,8 @@ class RangeSelector(QtGui.QDialog):
         for i, w in enumerate(weights):
             self.weight_spinners[i].setValue(int(round(100*w)))
         for t, w in tokens:
+            if t[0] == '#':
+                continue
             i = weights.index(w)
             if len(t) == 4:
                 self.single_hands[i].append(t)

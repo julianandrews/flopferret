@@ -34,7 +34,7 @@ class MainWindow(QtGui.QWidget):
         
     def initUI(self):
         self.setWindowTitle("Flop Ferret")
-        
+       
         main_layout = QtGui.QVBoxLayout(self)
         input_layout = self.make_input_layout()
         output_layout = self.make_output_layout()
