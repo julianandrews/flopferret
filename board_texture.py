@@ -39,8 +39,8 @@ class BoardTexture(dict):
             if not prob == 0.0:
                 cards = board + list(hand)
                 result = eval7.evaluate(cards)
-                hand_type_index = result >> 12
                 hand_type = eval7.hand_type(result)
+                hand_type_index = hand_types.index(hand_type)
                 self[hand_type] += prob
                 if len(cards) < 7: 
                     if hand_type_index < 5 and self.check_flush_draw(cards):
