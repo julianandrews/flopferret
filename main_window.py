@@ -20,7 +20,7 @@ from PySide import QtCore, QtGui
 import board_texture
 import percent_display
 import range_selector
-import range_string
+import eval7.range_string
 import saved_ranges
 
 class MainWindow(QtGui.QWidget):
@@ -87,9 +87,8 @@ class MainWindow(QtGui.QWidget):
             layout.addWidget(label, row, column)
             layout.addWidget(self.outputs[key], row, column+1)
 
-        for i, (key, name) in enumerate(zip(board_texture.hand_types, 
-                board_texture.readable_hand_types)):
-            add_output(key, i+1, 0, name)
+        for i, name in enumerate(board_texture.hand_types):
+            add_output(name, i+1, 0, name)
         layout.addWidget(pair_label, 0, 2, 1, 2)
         for i, key in enumerate(board_texture.pair_types):
             add_output(key, i+1, 2)
@@ -142,7 +141,7 @@ class RangeValidator(QtGui.QValidator):
     """Validator for range input."""
 
     def validate(self, s, pos):
-        if range_string.validate_string(s):
+        if eval7.range_string.validate_string(s):
             # replace tags with saved ranges
             tags = s.split('#')[1::2] 
             for tag in tags:
@@ -158,7 +157,7 @@ class RangeValidator(QtGui.QValidator):
                 if c == '#':
                     # a parseable string always has properly completed tags
                     in_tag = not in_tag
-                if not in_tag and c in ''.join(range_string.ranks).lower():
+                if not in_tag and c in ''.join(eval7.range_string.ranks).lower():
                     c = c.upper()
                 new_s += c
             return [QtGui.QValidator.Acceptable, new_s, pos]
@@ -169,8 +168,8 @@ class RangeValidator(QtGui.QValidator):
 class BoardValidator(QtGui.QRegExpValidator):
     """Validator for board input."""
 
-    _rank_str = ''.join(range_string.ranks)+''.join(range_string.ranks).lower()
-    _suit_str = ''.join(range_string.suits)
+    _rank_str = ''.join(eval7.range_string.ranks)+''.join(eval7.range_string.ranks).lower()
+    _suit_str = ''.join(eval7.range_string.suits)
     _card_str = "[{}][{}]".format(_rank_str, _suit_str)
     _board_str = "({}( *)?){{3,5}}".format(_card_str)
     _re = QtCore.QRegExp(_board_str)
@@ -192,7 +191,7 @@ class BoardValidator(QtGui.QRegExpValidator):
             s = " ".join(card_strs)
             new_pos = strip_pos + (strip_pos)/2-1
             # make ranks upper case
-            for r in range_string.ranks:
+            for r in eval7.range_string.ranks:
                 s = s.replace(r.lower(), r)
         elif result == QtGui.QValidator.Invalid:
             # loosen standard for intermediate matches

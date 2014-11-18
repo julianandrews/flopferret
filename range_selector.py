@@ -17,7 +17,7 @@
 
 from PySide import QtGui, QtCore
 
-import range_string
+import eval7.range_string
 import saved_ranges
 
 class RangeSelector(QtGui.QDialog):
@@ -81,8 +81,8 @@ class RangeSelector(QtGui.QDialog):
                     suitedness = 'o'
                 else:
                     suitedness = ''
-                label = range_string.ranks[12-min(x, y)] + \
-                        range_string.ranks[12-max(x, y)] + suitedness
+                label = eval7.range_string.ranks[12-min(x, y)] + \
+                        eval7.range_string.ranks[12-max(x, y)] + suitedness
                 button = RangeSelectorButton(label, suitedness)
                 button.clicked.connect(lambda token=label: 
                         self.handle_click(token))
@@ -127,7 +127,7 @@ class RangeSelector(QtGui.QDialog):
     def handle_click(self, token):
         modifiers = QtGui.QApplication.keyboardModifiers()
         i = self.weight_selector.currentIndex()
-        tokens = [t for (t, w) in range_string.string_to_tokens(token + '+')]
+        tokens = [t for (t, w) in eval7.range_string.string_to_tokens(token + '+')]
         if modifiers == QtCore.Qt.ShiftModifier:
             state = True
         elif modifiers == QtCore.Qt.ControlModifier:
@@ -161,7 +161,7 @@ class RangeSelector(QtGui.QDialog):
         if name == "":
             #some sort of feedback maybe?
             return
-        range_str = self.range_string()
+        range_str = self.eval7.range_string()
         i = self.saved_ranges.findText(name)
         if i > 0:
             self.saved_ranges.setItemData(i, range_str)
@@ -172,7 +172,7 @@ class RangeSelector(QtGui.QDialog):
     def load_range(self):
         i = self.saved_ranges.currentIndex()
         data = self.saved_ranges.itemData(i)
-        self.set_from_range_string(data)
+        self.set_from_eval7.range_string(data)
 
     def write_ranges(self):
         data = [(self.saved_ranges.itemText(i), self.saved_ranges.itemData(i)) 
@@ -192,7 +192,7 @@ class RangeSelector(QtGui.QDialog):
         if state[0] == QtGui.QValidator.Acceptable:
             color = '#b2ebf2' # light blue
             i = self.weight_selector.currentIndex()
-            tokens = range_string.string_to_tokens(state[1])
+            tokens = eval7.range_string.string_to_tokens(state[1])
             self.single_hands[i] = [t for (t, w) in tokens]
             self.purge_duplicate_singles()
             self.set_percent_label()
@@ -207,7 +207,7 @@ class RangeSelector(QtGui.QDialog):
             for token, button in self.grid_buttons.iteritems():
                 if button.weights[i]:
                     hands = [''.join(x) for x in 
-                            range_string.token_to_hands(token)]
+                            eval7.range_string.token_to_hands(token)]
                     self.single_hands[i] = [h for h in self.single_hands[i] 
                             if not h in hands]
             self.single_hands[i] = list(set(self.single_hands[i]))
@@ -223,11 +223,11 @@ class RangeSelector(QtGui.QDialog):
     def set_single_hand_input(self):
         i = self.weight_selector.currentIndex()
         token_list = [(t, 1.0) for t in self.single_hands[i]]
-        s = range_string.tokens_to_string(token_list)
+        s = eval7.range_string.tokens_to_string(token_list)
         self.single_hand_input.setText(s)
 
     def set_from_range_string(self, s):
-        tokens = range_string.string_to_tokens(s)
+        tokens = eval7.range_string.string_to_tokens(s)
         self.clear()
         weights = sorted(set(w for (t, w) in tokens), reverse=True)
         if 1.0 in weights:
@@ -268,7 +268,7 @@ class RangeSelector(QtGui.QDialog):
         for i, tokens in enumerate(self.single_hands):
             weight = self.weight_spinners[i].value()/100.0
             token_list += [(token, weight) for token in tokens]
-        return range_string.tokens_to_string(token_list)
+        return eval7.range_string.tokens_to_string(token_list)
 
 class RangeSelectorButton(QtGui.QPushButton):
 
@@ -324,8 +324,8 @@ class RangeSelectorButton(QtGui.QPushButton):
 class SingleHandListValidator(QtGui.QRegExpValidator):
 
     _hand_str = "[{rank}][{suit}][{rank}][{suit}]".format(
-            rank=''.join(range_string.ranks), 
-            suit=''.join(range_string.suits))
+            rank=''.join(eval7.range_string.ranks), 
+            suit=''.join(eval7.range_string.suits))
     _hand_list_str = "({hand}(, ?{hand})*)?".format(hand=_hand_str)
     _re = QtCore.QRegExp(_hand_list_str)
 
@@ -341,9 +341,9 @@ class SingleHandListValidator(QtGui.QRegExpValidator):
                 hands.remove('')
             try:
                 for hand in hands:
-                    normalized = range_string.normalize_token(hand)
+                    normalized = eval7.range_string.normalize_token(hand)
                     s = s.replace(hand, normalized)
-            except range_string.RangeStringError, e:
+            except eval7.range_string.RangeStringError, e:
                 result = QtGui.QValidator.Invalid
         return [result, s, pos]
 

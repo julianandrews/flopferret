@@ -15,10 +15,8 @@
 
 """A class to store a weighted range of hands"""
 
-import pokereval
-import range_string
-
-evaluator = pokereval.PokerEval()
+import eval7
+import eval7.range_string
 
 class HandRange(dict):
 
@@ -29,16 +27,15 @@ class HandRange(dict):
             self._from_str(range_str)
 
     def _from_str(self, range_str):
-        hand_str_list = range_string.string_to_hands(range_str)
+        hand_str_list = eval7.range_string.string_to_hands(range_str)
         for hand in self:
             self[hand] = 0.0
-        for hand_strs, weight in hand_str_list:
-            hand = tuple(map(evaluator.string2card, hand_strs))
+        for hand, weight in hand_str_list:
             self[hand] += weight
         self.normalize()
 
     def set_zeros(self):
-        d = evaluator.deck()
+        d = eval7.Deck()
         for i in range(51):
             for j in range(i+1, 52):
                 key = (d[j], d[i])

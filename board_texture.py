@@ -13,17 +13,13 @@
 #
 # You should have received a copy of the GNU General Public License
 
-import pokereval
+import eval7
 import hand_range
 
-hand_types = ["NoPair", "OnePair", "TwoPair", "Trips", "Straight", "Flush", 
-    "FlHouse", "Quads", "StFlush"] 
-readable_hand_types = ["High Card", "Pair", "Two Pair", "Trips", "Straight", 
-    "Flush", "Full House", "Quads", "Straight Flush"]
+hand_types = ["High Card", "Pair", "Two Pair", "Trips", "Straight", "Flush", 
+    "Full House", "Quads", "Straight Flush"] 
 draw_types = ["Flush Draw", "OESD", "Gutshot"]
 pair_types = ["Over Pair", "Top Pair", "Second Pair", "Low Pair", "Board Pair"]
-
-evaluator = pokereval.PokerEval()
 
 class BoardTexture(dict):
 
@@ -34,7 +30,7 @@ class BoardTexture(dict):
     def calculate(self, hr_str, board_strs):
         for key in hand_types + draw_types + pair_types:
             self[key] = 0.0
-        board = map(evaluator.string2card, board_strs)
+        board = map(eval7.Card, board_strs)
         hr = hand_range.HandRange(hr_str)
         hr.exclude_cards(board)
         if len(board) < 3:
@@ -42,14 +38,16 @@ class BoardTexture(dict):
         for hand, prob in hr.iteritems():
             if not prob == 0.0:
                 cards = board + list(hand)
-                result = evaluator.best('hi', cards)
-                hand_type = result[1][0]
+                result = eval7.evaluate(cards)
+                hand_type_index = result >> 12
+                hand_type = eval7.hand_type(result)
                 self[hand_type] += prob
                 if len(cards) < 7: 
-                    if result[0] < 84226576 and self.check_flush_draw(cards):
+                    if hand_type_index < 5 and self.check_flush_draw(cards):
                         # worse than flush
                         self["Flush Draw"] += prob
-                    if result[0] < 67305472: # worse than straight
+                    if hand_type_index < 4: 
+                        # worse than straight
                         result = self.check_straight_draw(cards)
                         if result == 2:
                             self["OESD"] += prob
@@ -62,7 +60,7 @@ class BoardTexture(dict):
     def check_flush_draw(cards):
         suit_counts = [0, 0, 0, 0]
         for c in cards:
-            suit_counts[c/13] += 1
+            suit_counts[c.suit] += 1
         if max(suit_counts) == 4:    
             return True
         else:
@@ -70,7 +68,7 @@ class BoardTexture(dict):
 
     @staticmethod
     def check_straight_draw(cards):
-        rs = set(c%13 for c in cards)
+        rs = set(c.rank for c in cards)
         bits = 0
         for r in rs:
             bits |= (2<<r)
@@ -88,8 +86,8 @@ class BoardTexture(dict):
     @staticmethod
     def pair_type(hand, board):
         rank_counts = [0]*13
-        board_ranks = sorted(c%13 for c in board)
-        hand_ranks = [c%13 for c in hand]
+        board_ranks = sorted(c.rank for c in board)
+        hand_ranks = [c.rank for c in hand]
         for r in board_ranks + hand_ranks:
             rank_counts[r] += 1
         pair_rank = rank_counts.index(2)

@@ -42,7 +42,7 @@ import pyparsing
 # and of individual hands in a canonical string.
 # The suit order must match the order of the evaluator deck.
 ranks = ('2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A')
-suits = ('h', 'd', 'c', 's')
+suits = ('c', 'd', 'h', 's')
 
 def string_to_hands(s):
     """Parse a handstring and return a list of (hand, weight) tuples."""
