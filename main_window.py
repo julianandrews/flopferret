@@ -151,12 +151,11 @@ class RangeValidator(QtGui.QValidator):
 
     def validate(self, s, pos):
         if eval7.range_string.validate_string(s):
-            # replace tags with saved ranges
+            # Replace tags with saved ranges.
             tags = s.split('#')[1::2] 
             for tag in tags:
-                matches = [x for x in self.saved_ranges if x[0] == tag]
-                if not len(matches) == 0:
-                    new_str = matches[0][1]
+                new_str = self.saved_ranges.get(tag)
+                if not new_str == None:
                     s = s.replace("#{}#".format(tag), new_str)
                     pos = len(s)
             # fix case of tokens
@@ -164,19 +163,18 @@ class RangeValidator(QtGui.QValidator):
             new_s = ""
             for c in s:
                 if c == '#':
-                    # a parseable string always has properly completed tags
+                    # A parseable string always has properly completed tags.
                     in_tag = not in_tag
                 if not in_tag and c in ''.join(eval7.range_string.ranks).lower():
                     c = c.upper()
                 new_s += c
             return [QtGui.QValidator.Acceptable, new_s, pos]
         else:
-            # accept any input as intermediate 
+            # Accept any other input as intermediate.
             return [QtGui.QValidator.Intermediate, s, pos]
 
 class BoardValidator(QtGui.QRegExpValidator):
     """Validator for board input."""
-
     _rank_str = ''.join(eval7.range_string.ranks) + \
                 ''.join(eval7.range_string.ranks).lower()
     _suit_str = ''.join(eval7.range_string.suits)

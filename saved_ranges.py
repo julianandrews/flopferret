@@ -35,7 +35,7 @@ def load():
             data = json.load(f)
         return data
     except IOError:
-        return []
+        return {}
 
 def dump(data):
     """Dump data to FlopFerret config file."""
