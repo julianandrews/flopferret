@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 
-"""Simple interface to save ranges to config file"""
+"""Simple interface to FlopFerret config file"""
 
 import json
 import os
@@ -25,22 +25,21 @@ if sys.platform.startswith('linux'):
 elif sys.platform == 'win32':
     data_dir = os.getenv('APPDATA')
     
-save_dir = os.path.join(data_dir, "flopferret")
-save_file = os.path.join(save_dir, "hand_ranges.json")
+config_dir = os.path.join(data_dir, "flopferret")
+config_filename = os.path.join(config_dir, "hand_ranges.json")
 
 def load():
+    """Load data from FlopFerret config file."""
     try:
-        with open(save_file, 'r') as f:
+        with open(config_filename, 'r') as f:
             data = json.load(f)
         return data
     except IOError:
-        return []
+        return {}
 
 def dump(data):
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    try:
-        with open(save_file, "w+") as f:
-            json.dump(data, f)
-    except IOError, e:
-        raise
+    """Dump data to FlopFerret config file."""
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+    with open(config_filename, "w+") as f:
+        json.dump(data, f)

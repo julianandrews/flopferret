@@ -22,16 +22,16 @@ draw_types = ["Flush Draw", "OESD", "Gutshot"]
 pair_types = ["Over Pair", "Top Pair", "Second Pair", "Low Pair", "Board Pair"]
 
 class BoardTexture(dict):
-
     def __init__(self):
         for key in hand_types + draw_types + pair_types:
             self[key] = 0.0
 
-    def calculate(self, hr_str, board_strs):
+    def calculate(self, hand_range_string, board_card_strings):
+        """Calculate the probabilities of each hand type."""
         for key in hand_types + draw_types + pair_types:
             self[key] = 0.0
-        board = map(eval7.Card, board_strs)
-        hr = hand_range.HandRange(hr_str)
+        board = map(eval7.Card, board_card_strings)
+        hr = hand_range.HandRange(hand_range_string)
         hr.exclude_cards(board)
         if len(board) < 3:
             raise ValueError("Not enough cards in board!")
@@ -40,51 +40,52 @@ class BoardTexture(dict):
                 cards = board + list(hand)
                 result = eval7.evaluate(cards)
                 hand_type = eval7.hand_type(result)
-                hand_type_index = hand_types.index(hand_type)
                 self[hand_type] += prob
-                if len(cards) < 7: 
-                    if hand_type_index < 5 and self.check_flush_draw(cards):
-                        # worse than flush
+                if len(cards) < 7 and hand_types.index(hand_type) < 5: 
+                    # No flush or better, so there may be draws.
+                    if self.check_flush_draw(cards):
                         self["Flush Draw"] += prob
-                    if hand_type_index < 4: 
-                        # worse than straight
-                        result = self.check_straight_draw(cards)
-                        if result == 2:
-                            self["OESD"] += prob
-                        elif result == 1:
-                            self["Gutshot"] += prob
-                if hand_type == "OnePair":
+                    if hand_type != 'Straight':
+                        straight_draw_type = self.check_straight_draw(cards)
+                        if not straight_draw_type == None:
+                            self[straight_draw_type] += prob
+                if hand_type == "Pair":
+                    # Break down pairs by type.
                     self[self.pair_type(hand, board)] += prob
                     
     @staticmethod
     def check_flush_draw(cards):
+        """Determine if `cards` contain a flush draw."""
         suit_counts = [0, 0, 0, 0]
-        for c in cards:
-            suit_counts[c.suit] += 1
-        if max(suit_counts) == 4:    
-            return True
-        else:
-            return False
+        for card in cards:
+            suit_counts[card.suit] += 1
+        return max(suit_counts) == 4
 
     @staticmethod
     def check_straight_draw(cards):
-        rs = set(c.rank for c in cards)
+        """Determine if `cards` contain an OESD or Gutshot."""
         bits = 0
-        for r in rs:
-            bits |= (2<<r)
-            if r == 12:
-                bits |= 1
+        # Build a bitmask for the card ranks.
+        for card in cards:
+            bits |= 2<<card.rank
+            if card.rank == 12:
+                bits |= 1 # Bottom bit represents the low ace.
+
+        # Look for '11110' or '1011101' (Open Ended Straight Draw)
         for i in range(9):
             s = bits>>i
-            if s&31 == 30 or s&127 == 93: #OESD!
-                return 2
+            if s&31 == 30 or s&127 == 93:
+                return 'OESD'
+
+        # Look for Gutshot bit patterns
         for i in range(10):
-            if (bits>>i)&31 in (30, 29, 27, 23, 15): # Gutshot!
-                return 1
-        return 0
+            if (bits>>i)&31 in (30, 29, 27, 23, 15):
+                return 'Gutshot'
+        return None
  
     @staticmethod
     def pair_type(hand, board):
+        """Determine the kind of pair, assuming one pair hand."""
         rank_counts = [0]*13
         board_ranks = sorted(c.rank for c in board)
         hand_ranks = [c.rank for c in hand]

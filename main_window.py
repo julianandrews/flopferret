@@ -33,18 +33,21 @@ class MainWindow(QtGui.QWidget):
         self.initUI()
         
     def initUI(self):
+        # Build the window UI and show it.
         self.setWindowTitle("Flop Ferret")
        
         main_layout = QtGui.QVBoxLayout(self)
         input_layout = self.make_input_layout()
         output_layout = self.make_output_layout()
+
         main_layout.addLayout(input_layout)
         main_layout.addLayout(output_layout)
-        self.setLayout(main_layout)
 
+        self.setLayout(main_layout)
         self.show()
 
     def make_input_layout(self):
+        # Build the layout for the inputs.
         self.range_input = QtGui.QLineEdit()
         self.range_validator = RangeValidator()
         self.range_validator.saved_ranges = saved_ranges.load()
@@ -68,38 +71,42 @@ class MainWindow(QtGui.QWidget):
         return layout
 
     def make_output_layout(self):
-        self.outputs = {}
-        for key, value in self.board_texture.iteritems():
-            output = percent_display.PercentDisplayWidget(value, 
-                    max_bar_width=100, color="#00BED4")
-            self.outputs[key] = output
-        
+        # Build the layout for the outputs.
         layout = QtGui.QGridLayout()
-        hand_type_label = QtGui.QLabel("<b>Hand Type Breakdown</b>")
-        pair_label = QtGui.QLabel("<b>Pair Breakdown</b>")
-        draw_label = QtGui.QLabel("<b>Draw Breakdown</b>")
-        layout.addWidget(hand_type_label, 0, 0, 1, 2)
+        # Store a dictionary of PercentDisplay outputs for easy update.
+        self.outputs = {}
+        for name, probability in self.board_texture.iteritems():
+            output = percent_display.PercentDisplayWidget(probability, 
+                    max_bar_width=100, color="#00BED4")
+            self.outputs[name] = output
         
-        def add_output(key, row, column, name=None):
-            name = name or key
+        def add_output(name, row, column):
             label = QtGui.QLabel(name)
             label.setContentsMargins(30, 0, 0, 0)
             layout.addWidget(label, row, column)
-            layout.addWidget(self.outputs[key], row, column+1)
+            layout.addWidget(self.outputs[name], row, column+1)
 
+        # Add base hand type outputs to layout
+        hand_type_label = QtGui.QLabel("<b>Hand Type Breakdown</b>")
+        layout.addWidget(hand_type_label, 0, 0, 1, 2)
         for i, name in enumerate(board_texture.hand_types):
-            add_output(name, i+1, 0, name)
+            add_output(name, i+1, 0)
+        # Add pair breakdown outputs
+        pair_label = QtGui.QLabel("<b>Pair Breakdown</b>")
         layout.addWidget(pair_label, 0, 2, 1, 2)
-        for i, key in enumerate(board_texture.pair_types):
-            add_output(key, i+1, 2)
+        for i, name in enumerate(board_texture.pair_types):
+            add_output(name, i+1, 2)
+        # Add draw breakdown outputs
+        draw_label = QtGui.QLabel("<b>Draw Breakdown</b>")
         layout.addWidget(draw_label, i+2, 2, 1, 2)
-        for j, key in enumerate(board_texture.draw_types):
-            add_output(key, i+j+3, 2)
+        for j, name in enumerate(board_texture.draw_types):
+            add_output(name, i+j+3, 2)
+
         return layout
 
     def check_input_state(self, *args, **kwargs):
-        """Check if a QLineEdit has a valid input, and set the color
-        appropriately. Used by the range and board inputs."""
+        # Check if a QLineEdit has a valid input, and set the color
+        # appropriately. Used by the range and board inputs.
         sender = self.sender()
         validator = sender.validator()
         state = validator.validate(sender.text(), 0)
@@ -115,13 +122,15 @@ class MainWindow(QtGui.QWidget):
     def set_range(self):
         """Open a RangeSelector dialog to set range_input"""
         selector = range_selector.RangeSelector(self)
-        text = self.range_input.text()
+        range_string = self.range_input.text()
         validator = self.range_input.validator()
-        if validator.validate(text, 0)[0] == QtGui.QValidator.Acceptable:
-            selector.set_from_range_string(text)
+        if validator.validate(range_string, 0)[0] == validator.Acceptable:
+            selector.set_from_range_string(range_string)
         if selector.exec_():
-            text = selector.range_string()
-            self.range_input.setText(text)
+            # Update the range input on success    
+            new_range_string = selector.range_string()
+            self.range_input.setText(new_range_string)
+        # Reload saved_ranges in case updated by selector.
         self.range_validator.saved_ranges = saved_ranges.load()
 
     def calculate(self):
@@ -129,11 +138,11 @@ class MainWindow(QtGui.QWidget):
         if not self.range_input.hasAcceptableInput() or \
                 not self.board_input.hasAcceptableInput():
             return
-        hr_string = self.range_input.text()
+        range_string = self.range_input.text()
         board_string = self.board_input.text().replace(" ", "")
         board = [board_string[i:i+2] for i in 
                 range(0, len(board_string)-1, 2)]
-        self.board_texture.calculate(hr_string, board)
+        self.board_texture.calculate(range_string, board)
         for key, output in self.outputs.iteritems():
             output.setValue(self.board_texture[key])
 
@@ -142,12 +151,11 @@ class RangeValidator(QtGui.QValidator):
 
     def validate(self, s, pos):
         if eval7.range_string.validate_string(s):
-            # replace tags with saved ranges
+            # Replace tags with saved ranges.
             tags = s.split('#')[1::2] 
             for tag in tags:
-                matches = [x for x in self.saved_ranges if x[0] == tag]
-                if not len(matches) == 0:
-                    new_str = matches[0][1]
+                new_str = self.saved_ranges.get(tag)
+                if not new_str == None:
                     s = s.replace("#{}#".format(tag), new_str)
                     pos = len(s)
             # fix case of tokens
@@ -155,48 +163,60 @@ class RangeValidator(QtGui.QValidator):
             new_s = ""
             for c in s:
                 if c == '#':
-                    # a parseable string always has properly completed tags
+                    # A parseable string always has properly completed tags.
                     in_tag = not in_tag
                 if not in_tag and c in ''.join(eval7.range_string.ranks).lower():
                     c = c.upper()
                 new_s += c
             return [QtGui.QValidator.Acceptable, new_s, pos]
         else:
-            # accept any input as intermediate 
+            # Accept any other input as intermediate.
             return [QtGui.QValidator.Intermediate, s, pos]
 
 class BoardValidator(QtGui.QRegExpValidator):
     """Validator for board input."""
-
-    _rank_str = ''.join(eval7.range_string.ranks)+''.join(eval7.range_string.ranks).lower()
+    _rank_str = ''.join(eval7.range_string.ranks) + \
+                ''.join(eval7.range_string.ranks).lower()
     _suit_str = ''.join(eval7.range_string.suits)
-    _card_str = "[{}][{}]".format(_rank_str, _suit_str)
-    _board_str = "({}( *)?){{3,5}}".format(_card_str)
-    _re = QtCore.QRegExp(_board_str)
-    _partial_card = "(({})|[{}]|[{}])".format(_card_str, _rank_str, _suit_str)
-    _int_re = QtCore.QRegExp("({}( *)?){{0,5}}".format(_partial_card))
+    # A card is a rank and a suit.
+    _card_re_str = "[{}][{}]".format(_rank_str, _suit_str)
+    # A board is 3-5 cards, optionally with spaces between them.
+    _board_re = QtCore.QRegExp("({}( *)?){{3,5}}".format(_card_re_str))
+    # A partial card is a card, a rank, or a suit.
+    _partial_card_re_str = "(({})|[{}]|[{}])".format(_card_re_str, 
+            _rank_str, _suit_str)
+    # A sequence of partial cards is an intermediate match.
+    _partial_board_re = QtCore.QRegExp("({}( *)?){{0,5}}".format(
+        _partial_card_re_str))
 
     def __init__(self):
-        super(BoardValidator, self).__init__(self._re)
+        super(BoardValidator, self).__init__(self._board_re)
+
+    def _get_card_strings(self, s):
+        stripped = s.replace(' ', '')
+        card_strings = [stripped[i:i+2].capitalize() 
+                        for i in range(0, len(stripped) - 1, 2)]
+        if any(card_strings.count(x) > 1 for x in card_strings):
+            return None
+        else:
+            return card_strings
 
     def validate(self, s, pos):
         result, s, new_pos = super(BoardValidator, self).validate(s, pos)
-        if result == QtGui.QValidator.Acceptable:
-            # prevent duplicate cards and fix spaces
-            strip_pos = len(s[:new_pos].replace(" ", ""))
-            s = s.replace(" ", "")
-            card_strs = [s[i:i+2] for i in range(0, len(s)-1, 2)]
-            if any(card_strs.count(x) > 1 for x in card_strs):
-                result = QtGui.QValidator.Invalid
-            s = " ".join(card_strs)
-            new_pos = strip_pos + (strip_pos)/2-1
-            # make ranks upper case
-            for r in eval7.range_string.ranks:
-                s = s.replace(r.lower(), r)
-        elif result == QtGui.QValidator.Invalid:
-            # loosen standard for intermediate matches
-            if self._int_re.exactMatch(s):
+        if result == QtGui.QValidator.Invalid:
+            # Partial cards are intermediate.
+            if self._partial_board_re.exactMatch(s):
                 result = QtGui.QValidator.Intermediate
                 new_pos = pos
+        else:
+            card_strings = self._get_card_strings(s)
+            if card_strings is None:
+                # Duplicate cards are invalid.
+                result = QtGui.QValidator.Invalid
+            elif result == QtGui.QValidator.Acceptable:
+                # Reposition to account for the inserted spaces.
+                stripped_pos = len(s[:new_pos].replace(' ',''))
+                new_pos = stripped_pos + (stripped_pos - 1)//2
+                s = ' '.join(card_strings)
         return [result, s, new_pos]
 

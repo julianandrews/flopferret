@@ -151,7 +151,7 @@ class RangeSelector(QtGui.QDialog):
 
     def load_data(self):
         data = saved_ranges.load()
-        for (name, range_str) in data:
+        for (name, range_str) in data.iteritems():
             self.saved_ranges.addItem(name, userData=range_str)
         if len(data) == 0:
             self.saved_ranges.addItem("", userData="")
@@ -161,7 +161,7 @@ class RangeSelector(QtGui.QDialog):
         if name == "":
             #some sort of feedback maybe?
             return
-        range_str = self.eval7.range_string()
+        range_str = self.range_string()
         i = self.saved_ranges.findText(name)
         if i > 0:
             self.saved_ranges.setItemData(i, range_str)
@@ -172,11 +172,11 @@ class RangeSelector(QtGui.QDialog):
     def load_range(self):
         i = self.saved_ranges.currentIndex()
         data = self.saved_ranges.itemData(i)
-        self.set_from_eval7.range_string(data)
+        self.set_from_range_string(data)
 
     def write_ranges(self):
-        data = [(self.saved_ranges.itemText(i), self.saved_ranges.itemData(i)) 
-                for i in range(self.saved_ranges.count())]
+        data = {self.saved_ranges.itemText(i): self.saved_ranges.itemData(i)
+                for i in range(self.saved_ranges.count())}
         return saved_ranges.dump(data)
 
     def delete_range(self):

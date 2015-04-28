@@ -22,11 +22,11 @@ class PercentDisplayWidget(QtGui.QWidget):
            wid.setValue(0.8)
     """
 
-    def __init__(self, value=None, max_bar_width=None, color=None):
+    def __init__(self, value=0.0, max_bar_width=250.0, color='#000000'):
         super(PercentDisplayWidget, self).__init__()
-        self.value = value or 0.0
-        self.max_bar_width = max_bar_width or 250.0
-        self.color = color or "#000000"
+        self.value = value
+        self.max_bar_width = max_bar_width
+        self.color = color
         self.initUI()
 
     def initUI(self):
@@ -36,28 +36,31 @@ class PercentDisplayWidget(QtGui.QWidget):
         self.label = QtGui.QLabel()
         layout.addSpacerItem(self.spacer)
         layout.addWidget(self.label)
-        self.setValue(self.value)
         self.setLayout(layout)
         self.setFixedWidth(80 + self.max_bar_width)
+        self.setValue(self.value)
 
     def setValue(self, value):
+        """Set the value to display (0 <= value <= 1)."""
+        if value < 0 or value > 1:
+            raise ValueError('Only values between 0 and 1 are supported')
         self.value = value
         self.label.setText("{:.2f}%".format(self.value*100))
         self.repaint()
 
-    def paintEvent(self, e):
+    def paintEvent(self, event):
         qp = QtGui.QPainter()
         qp.begin(self)
         self.drawWidget(qp)
         qp.end()
 
     def drawWidget(self, qp):
-        size = self.size()
-        height = size.height()
-        width = self.max_bar_width*self.value
-        self.spacer.changeSize(width, 0)
+        box_height = self.size().height()
+        bar_width = self.max_bar_width*self.value
+        self.spacer.changeSize(bar_width, 0)
         color = QtGui.QColor(self.color)
         qp.setPen(QtGui.QPen(color))
         qp.setBrush(QtGui.QBrush(color))
-        qp.drawRect(0, int(round(0.25*height)), width, int(round(0.5*height)))
+        qp.drawRect(0, int(round(box_height/4.0)), bar_width, 
+                    int(round(box_height/2.0)))
 
