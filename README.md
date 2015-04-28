@@ -9,7 +9,7 @@ Installation
 Download the most recent release [here](https://github.com/JulianAndrews/flopferret/releases).
 
 ### Linux/OS X
-Installation is currently largely manual. You'll need Python 2.6 or 2.7 and Cython. First get [pyEval7](https://github.com/JulianAndrews/pyeval7). After downloading the repo, install pyEval7 with
+Installation is currently largely manual. You'll need Python 2.6 or 2.7 and Cython. First get [pyEval7](https://github.com/JulianAndrews/pyeval7). After downloading the repo, install pyEval7 with:
 
     python setup.py install
  
