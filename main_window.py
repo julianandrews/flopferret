@@ -31,11 +31,11 @@ class MainWindow(QtGui.QWidget):
         self.board_texture = board_texture.BoardTexture()
 
         self.initUI()
-        
+
     def initUI(self):
         # Build the window UI and show it.
         self.setWindowTitle("Flop Ferret")
-       
+
         main_layout = QtGui.QVBoxLayout(self)
         input_layout = self.make_input_layout()
         output_layout = self.make_output_layout()
@@ -44,6 +44,8 @@ class MainWindow(QtGui.QWidget):
         main_layout.addLayout(output_layout)
 
         self.setLayout(main_layout)
+        QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Q),
+                        self, QtCore.SLOT("close()"))
         self.show()
 
     def make_input_layout(self):
@@ -76,10 +78,10 @@ class MainWindow(QtGui.QWidget):
         # Store a dictionary of PercentDisplay outputs for easy update.
         self.outputs = {}
         for name, probability in self.board_texture.iteritems():
-            output = percent_display.PercentDisplayWidget(probability, 
+            output = percent_display.PercentDisplayWidget(probability,
                     max_bar_width=100, color="#00BED4")
             self.outputs[name] = output
-        
+
         def add_output(name, row, column):
             label = QtGui.QLabel(name)
             label.setContentsMargins(30, 0, 0, 0)
@@ -127,7 +129,7 @@ class MainWindow(QtGui.QWidget):
         if validator.validate(range_string, 0)[0] == validator.Acceptable:
             selector.set_from_range_string(range_string)
         if selector.exec_():
-            # Update the range input on success    
+            # Update the range input on success
             new_range_string = selector.range_string()
             self.range_input.setText(new_range_string)
         # Reload saved_ranges in case updated by selector.
@@ -140,7 +142,7 @@ class MainWindow(QtGui.QWidget):
             return
         range_string = self.range_input.text()
         board_string = self.board_input.text().replace(" ", "")
-        board = [board_string[i:i+2] for i in 
+        board = [board_string[i:i+2] for i in
                 range(0, len(board_string)-1, 2)]
         self.board_texture.calculate(range_string, board)
         for key, output in self.outputs.iteritems():
@@ -152,7 +154,7 @@ class RangeValidator(QtGui.QValidator):
     def validate(self, s, pos):
         if eval7.range_string.validate_string(s):
             # Replace tags with saved ranges.
-            tags = s.split('#')[1::2] 
+            tags = s.split('#')[1::2]
             for tag in tags:
                 new_str = self.saved_ranges.get(tag)
                 if not new_str == None:
@@ -183,7 +185,7 @@ class BoardValidator(QtGui.QRegExpValidator):
     # A board is 3-5 cards, optionally with spaces between them.
     _board_re = QtCore.QRegExp("({}( *)?){{3,5}}".format(_card_re_str))
     # A partial card is a card, a rank, or a suit.
-    _partial_card_re_str = "(({})|[{}]|[{}])".format(_card_re_str, 
+    _partial_card_re_str = "(({})|[{}]|[{}])".format(_card_re_str,
             _rank_str, _suit_str)
     # A sequence of partial cards is an intermediate match.
     _partial_board_re = QtCore.QRegExp("({}( *)?){{0,5}}".format(
@@ -194,7 +196,7 @@ class BoardValidator(QtGui.QRegExpValidator):
 
     def _get_card_strings(self, s):
         stripped = s.replace(' ', '')
-        card_strings = [stripped[i:i+2].capitalize() 
+        card_strings = [stripped[i:i+2].capitalize()
                         for i in range(0, len(stripped) - 1, 2)]
         if any(card_strings.count(x) > 1 for x in card_strings):
             return None
