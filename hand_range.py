@@ -17,28 +17,29 @@
 import eval7
 import eval7.range_string
 
+
 class HandRange(dict):
     """A class to store a weighted range of hands. Each hand is a pair
     of cards with the higher card (by deck order) first."""
     def __init__(self, range_string=None):
         super(HandRange, self).__init__(self)
         self._set_zeros()
-        if not range_string is None:
+        if range_string is not None:
             self._from_str(range_string)
 
     def _from_str(self, range_string):
-        #Load range from range-string.
+        # Load range from range-string.
         hand_str_list = eval7.range_string.string_to_hands(range_string)
         for hand, weight in hand_str_list:
             self[hand] += weight
         self.normalize()
 
     def _set_zeros(self):
-        #Initialize range with zeros.
+        # Initialize range with zeros.
         deck = eval7.Deck()
         for i, card in enumerate(deck[:-1]):
             for other_card in deck[i+1:]:
-                self[(other_card, card)] = 0.0 # Higher card must be first!
+                self[(other_card, card)] = 0.0  # Higher card must be first!
 
     def normalize(self):
         """Normalize the hand range. Return the original total."""

@@ -23,6 +23,7 @@ import range_selector
 import eval7.range_string
 import saved_ranges
 
+
 class MainWindow(QtGui.QWidget):
     """The Main Window of the Application."""
 
@@ -78,8 +79,9 @@ class MainWindow(QtGui.QWidget):
         # Store a dictionary of PercentDisplay outputs for easy update.
         self.outputs = {}
         for name, probability in self.board_texture.iteritems():
-            output = percent_display.PercentDisplayWidget(probability,
-                    max_bar_width=100, color="#00BED4")
+            output = percent_display.PercentDisplayWidget(
+                probability, max_bar_width=100, color="#00BED4"
+            )
             self.outputs[name] = output
 
         def add_output(name, row, column):
@@ -113,11 +115,11 @@ class MainWindow(QtGui.QWidget):
         validator = sender.validator()
         state = validator.validate(sender.text(), 0)
         if state[0] == QtGui.QValidator.Acceptable:
-            color = '#b2ebf2' # light blue
+            color = '#b2ebf2'  # light blue
         elif state[0] == QtGui.QValidator.Intermediate:
-            color = '#fff79a' # yellow
+            color = '#fff79a'  # yellow
         else:
-            color = '#f6989d' # red
+            color = '#f6989d'  # red
         sender.setStyleSheet('QLineEdit { background-color: %s }' % color)
         self.calculate()
 
@@ -142,11 +144,11 @@ class MainWindow(QtGui.QWidget):
             return
         range_string = self.range_input.text()
         board_string = self.board_input.text().replace(" ", "")
-        board = [board_string[i:i+2] for i in
-                range(0, len(board_string)-1, 2)]
+        board = [board_string[i:i+2] for i in range(0, len(board_string)-1, 2)]
         self.board_texture.calculate(range_string, board)
         for key, output in self.outputs.iteritems():
             output.setValue(self.board_texture[key])
+
 
 class RangeValidator(QtGui.QValidator):
     """Validator for range input."""
@@ -157,7 +159,7 @@ class RangeValidator(QtGui.QValidator):
             tags = s.split('#')[1::2]
             for tag in tags:
                 new_str = self.saved_ranges.get(tag)
-                if not new_str == None:
+                if new_str is not None:
                     s = s.replace("#{}#".format(tag), new_str)
                     pos = len(s)
             # fix case of tokens
@@ -175,6 +177,7 @@ class RangeValidator(QtGui.QValidator):
             # Accept any other input as intermediate.
             return [QtGui.QValidator.Intermediate, s, pos]
 
+
 class BoardValidator(QtGui.QRegExpValidator):
     """Validator for board input."""
     _rank_str = ''.join(eval7.range_string.ranks) + \
@@ -185,8 +188,9 @@ class BoardValidator(QtGui.QRegExpValidator):
     # A board is 3-5 cards, optionally with spaces between them.
     _board_re = QtCore.QRegExp("({}( *)?){{3,5}}".format(_card_re_str))
     # A partial card is a card, a rank, or a suit.
-    _partial_card_re_str = "(({})|[{}]|[{}])".format(_card_re_str,
-            _rank_str, _suit_str)
+    _partial_card_re_str = "(({})|[{}]|[{}])".format(
+        _card_re_str, _rank_str, _suit_str
+    )
     # A sequence of partial cards is an intermediate match.
     _partial_board_re = QtCore.QRegExp("({}( *)?){{0,5}}".format(
         _partial_card_re_str))
@@ -217,8 +221,7 @@ class BoardValidator(QtGui.QRegExpValidator):
                 result = QtGui.QValidator.Invalid
             elif result == QtGui.QValidator.Acceptable:
                 # Reposition to account for the inserted spaces.
-                stripped_pos = len(s[:new_pos].replace(' ',''))
+                stripped_pos = len(s[:new_pos].replace(' ', ''))
                 new_pos = stripped_pos + (stripped_pos - 1)//2
                 s = ' '.join(card_strings)
         return [result, s, new_pos]
-

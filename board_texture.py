@@ -16,10 +16,20 @@
 import eval7
 import hand_range
 
-hand_types = ["High Card", "Pair", "Two Pair", "Trips", "Straight", "Flush", 
-    "Full House", "Quads", "Straight Flush"] 
+hand_types = [
+    "High Card",
+    "Pair",
+    "Two Pair",
+    "Trips",
+    "Straight",
+    "Flush",
+    "Full House",
+    "Quads",
+    "Straight Flush"
+]
 draw_types = ["Flush Draw", "OESD", "Gutshot"]
 pair_types = ["Over Pair", "Top Pair", "Second Pair", "Low Pair", "Board Pair"]
+
 
 class BoardTexture(dict):
     def __init__(self):
@@ -41,18 +51,18 @@ class BoardTexture(dict):
                 result = eval7.evaluate(cards)
                 hand_type = eval7.hand_type(result)
                 self[hand_type] += prob
-                if len(cards) < 7 and hand_types.index(hand_type) < 5: 
+                if len(cards) < 7 and hand_types.index(hand_type) < 5:
                     # No flush or better, so there may be draws.
                     if self.check_flush_draw(cards):
                         self["Flush Draw"] += prob
                     if hand_type != 'Straight':
                         straight_draw_type = self.check_straight_draw(cards)
-                        if not straight_draw_type == None:
+                        if straight_draw_type is not None:
                             self[straight_draw_type] += prob
                 if hand_type == "Pair":
                     # Break down pairs by type.
                     self[self.pair_type(hand, board)] += prob
-                    
+
     @staticmethod
     def check_flush_draw(cards):
         """Determine if `cards` contain a flush draw."""
@@ -67,22 +77,22 @@ class BoardTexture(dict):
         bits = 0
         # Build a bitmask for the card ranks.
         for card in cards:
-            bits |= 2<<card.rank
+            bits |= 2 << card.rank
             if card.rank == 12:
-                bits |= 1 # Bottom bit represents the low ace.
+                bits |= 1  # Bottom bit represents the low ace.
 
         # Look for '11110' or '1011101' (Open Ended Straight Draw)
         for i in range(9):
-            s = bits>>i
-            if s&31 == 30 or s&127 == 93:
+            s = bits >> i
+            if s & 31 == 30 or s & 127 == 93:
                 return 'OESD'
 
         # Look for Gutshot bit patterns
         for i in range(10):
-            if (bits>>i)&31 in (30, 29, 27, 23, 15):
+            if (bits >> i) & 31 in (30, 29, 27, 23, 15):
                 return 'Gutshot'
         return None
- 
+
     @staticmethod
     def pair_type(hand, board):
         """Determine the kind of pair, assuming one pair hand."""
@@ -92,7 +102,7 @@ class BoardTexture(dict):
         for r in board_ranks + hand_ranks:
             rank_counts[r] += 1
         pair_rank = rank_counts.index(2)
-        if not pair_rank in hand_ranks:
+        if pair_rank not in hand_ranks:
             return "Board Pair"
         elif pair_rank > board_ranks[-1]:
             return "Over Pair"
@@ -102,4 +112,3 @@ class BoardTexture(dict):
             return "Second Pair"
         else:
             return "Low Pair"
-

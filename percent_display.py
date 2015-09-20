@@ -13,11 +13,12 @@
 #
 # You should have received a copy of the GNU General Public License
 
-from PySide import QtGui, QtCore
+from PySide import QtGui
+
 
 class PercentDisplayWidget(QtGui.QWidget):
     """A simple percentage display widget with a bar and numerical label.
-    
+
     usage: wid = PercentDisplayWidget()
            wid.setValue(0.8)
     """
@@ -61,6 +62,5 @@ class PercentDisplayWidget(QtGui.QWidget):
         color = QtGui.QColor(self.color)
         qp.setPen(QtGui.QPen(color))
         qp.setBrush(QtGui.QBrush(color))
-        qp.drawRect(0, int(round(box_height/4.0)), bar_width, 
+        qp.drawRect(0, int(round(box_height/4.0)), bar_width,
                     int(round(box_height/2.0)))
-

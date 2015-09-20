@@ -20,6 +20,7 @@ from PySide import QtGui, QtCore
 import eval7.range_string
 import saved_ranges
 
+
 class RangeSelector(QtGui.QDialog):
 
     def __init__(self, parent):
@@ -58,8 +59,9 @@ class RangeSelector(QtGui.QDialog):
         single_hand_layout = self.layout_single_hand_input()
         main_layout.addLayout(single_hand_layout)
         buttonBox = QtGui.QDialogButtonBox(
-                QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel, 
-                parent=self)
+            QtGui.QDialogButtonBox.Ok | QtGui.QDialogButtonBox.Cancel,
+            parent=self,
+        )
         main_layout.addWidget(buttonBox)
         buttonBox.accepted.connect(self.accept)
         buttonBox.rejected.connect(self.reject)
@@ -75,24 +77,25 @@ class RangeSelector(QtGui.QDialog):
         grid.setSpacing(0)
         for x in range(13):
             for y in range(13):
-                if x < y: 
+                if x < y:
                     suitedness = 's'
                 elif x > y:
                     suitedness = 'o'
                 else:
                     suitedness = ''
                 label = eval7.range_string.ranks[12-min(x, y)] + \
-                        eval7.range_string.ranks[12-max(x, y)] + suitedness
+                    eval7.range_string.ranks[12-max(x, y)] + suitedness
                 button = RangeSelectorButton(label, suitedness)
-                button.clicked.connect(lambda token=label: 
-                        self.handle_click(token))
+                button.clicked.connect(
+                    lambda token=label: self.handle_click(token)
+                )
                 self.grid_buttons[label] = button
                 grid.addWidget(button, x, y)
         return grid
 
     def layout_weight_selector(self):
         layout = QtGui.QFormLayout()
-        labels = ["Weight {}".format(i) for i in range(1,5)]
+        labels = ["Weight {}".format(i) for i in range(1, 5)]
         self.weight_selector = QtGui.QComboBox()
         self.weight_selector.addItems(labels)
         self.weight_spinners = []
@@ -159,7 +162,7 @@ class RangeSelector(QtGui.QDialog):
     def save_range(self):
         name = self.saved_ranges.currentText()
         if name == "":
-            #some sort of feedback maybe?
+            # some sort of feedback maybe?
             return
         range_str = self.range_string()
         i = self.saved_ranges.findText(name)
@@ -190,26 +193,27 @@ class RangeSelector(QtGui.QDialog):
         validator = sender.validator()
         state = validator.validate(sender.text(), 0)
         if state[0] == QtGui.QValidator.Acceptable:
-            color = '#b2ebf2' # light blue
+            color = '#b2ebf2'  # light blue
             i = self.weight_selector.currentIndex()
             tokens = eval7.range_string.string_to_tokens(state[1])
             self.single_hands[i] = [t for (t, w) in tokens]
             self.purge_duplicate_singles()
             self.set_percent_label()
         elif state[0] == QtGui.QValidator.Intermediate:
-            color = '#fff79a' # yellow
+            color = '#fff79a'  # yellow
         else:
-            color = '#f6989d' # red
+            color = '#f6989d'  # red
         sender.setStyleSheet('QLineEdit { background-color: %s }' % color)
 
     def purge_duplicate_singles(self):
         for i in range(len(self.single_hands)):
             for token, button in self.grid_buttons.iteritems():
                 if button.weights[i]:
-                    hands = [''.join(x) for x in 
-                            eval7.range_string.token_to_hands(token)]
-                    self.single_hands[i] = [h for h in self.single_hands[i] 
-                            if not h in hands]
+                    hands = [''.join(x)
+                             for x in eval7.range_string.token_to_hands(token)]
+                    self.single_hands[i] = [
+                        h for h in self.single_hands[i] if h not in hands
+                    ]
             self.single_hands[i] = list(set(self.single_hands[i]))
         self.set_single_hand_input()
 
@@ -253,7 +257,7 @@ class RangeSelector(QtGui.QDialog):
         i = i or self.weight_selector.currentIndex()
         combos = 0
         for button in self.grid_buttons.values():
-            if button.weights[i]:  
+            if button.weights[i]:
                 combos += combo_counts[button.suitedness]
         combos += len(self.single_hands[i])
         return combos
@@ -270,17 +274,18 @@ class RangeSelector(QtGui.QDialog):
             token_list += [(token, weight) for token in tokens]
         return eval7.range_string.tokens_to_string(token_list)
 
+
 class RangeSelectorButton(QtGui.QPushButton):
 
-    _colors = {'s': "#98F098",'o': "#FF9898",'': "#9898F0"}
-    _selected_colors =  {'s': "#D8FFD8",'o': "#FFD8D8",'': "#D8D8FF"}
+    _colors = {'s': "#98F098", 'o': "#FF9898", '': "#9898F0"}
+    _selected_colors = {'s': "#D8FFD8", 'o': "#FFD8D8", '': "#D8D8FF"}
     _weight_colors = ["#404040", "#F06000", "#800080", "#0060D0"]
-    _weight_pos = [4, 8, 25, 29] 
+    _weight_pos = [4, 8, 25, 29]
     _style = """
-    QPushButton {{ 
+    QPushButton {{
         color: black;
         font-weight: bold;
-        background-color: {}; 
+        background-color: {};
         border: 1px solid black;
     }}
     QPushButton:pressed {{
@@ -291,7 +296,7 @@ class RangeSelectorButton(QtGui.QPushButton):
         background-color: {};
         font-weight: bold;
         padding: 0;
-    }}""" 
+    }}"""
 
     def __init__(self, label, suitedness):
         super(RangeSelectorButton, self).__init__()
@@ -305,8 +310,10 @@ class RangeSelectorButton(QtGui.QPushButton):
         self.setStyle(QtGui.QStyleFactory.create("Cleanlooks"))
         self.setFixedSize(35, 35)
         self.setCheckable(True)
-        ss = self._style.format(self._colors[self.suitedness],
-            self._selected_colors[self.suitedness])
+        ss = self._style.format(
+            self._colors[self.suitedness],
+            self._selected_colors[self.suitedness]
+        )
         self.setStyleSheet(ss)
 
     def paintEvent(self, event):
@@ -318,14 +325,15 @@ class RangeSelectorButton(QtGui.QPushButton):
                 pen = QtGui.QPen(color)
                 painter.setPen(pen)
                 painter.setBrush(QtGui.QColor(color))
-                #painter.drawRoundedRect(7*i+4, 24, 5, 5, 1, 1)
                 painter.drawRoundedRect(4, self._weight_pos[i], 27, 2, 1, 1)
+
 
 class SingleHandListValidator(QtGui.QRegExpValidator):
 
     _hand_str = "[{rank}][{suit}][{rank}][{suit}]".format(
-            rank=''.join(eval7.range_string.ranks), 
-            suit=''.join(eval7.range_string.suits))
+        rank=''.join(eval7.range_string.ranks),
+        suit=''.join(eval7.range_string.suits),
+    )
     _hand_list_str = "({hand}(, ?{hand})*)?".format(hand=_hand_str)
     _re = QtCore.QRegExp(_hand_list_str)
 
@@ -343,7 +351,6 @@ class SingleHandListValidator(QtGui.QRegExpValidator):
                 for hand in hands:
                     normalized = eval7.range_string.normalize_token(hand)
                     s = s.replace(hand, normalized)
-            except eval7.range_string.RangeStringError, e:
+            except eval7.range_string.RangeStringError:
                 result = QtGui.QValidator.Invalid
         return [result, s, pos]
-

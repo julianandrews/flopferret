@@ -24,9 +24,10 @@ if sys.platform.startswith('linux'):
     data_dir = xdg.BaseDirectory.xdg_data_home
 elif sys.platform == 'win32':
     data_dir = os.getenv('APPDATA')
-    
+
 config_dir = os.path.join(data_dir, "flopferret")
 config_filename = os.path.join(config_dir, "hand_ranges.json")
+
 
 def load():
     """Load data from FlopFerret config file."""
@@ -36,6 +37,7 @@ def load():
         return data
     except IOError:
         return {}
+
 
 def dump(data):
     """Dump data to FlopFerret config file."""
