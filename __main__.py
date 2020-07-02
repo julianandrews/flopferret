@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 import sys
 
-from PySide import QtGui
+from PySide2 import QtWidgets
 
 import main_window
 
 if __name__ == "__main__":
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     wid = main_window.MainWindow()
 
     sys.exit(app.exec_())

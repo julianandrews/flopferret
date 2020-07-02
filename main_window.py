@@ -15,16 +15,16 @@
 
 """Main Board Texture Analyzer Gui"""
 
-from PySide import QtCore, QtGui
+from PySide2 import QtCore, QtGui, QtWidgets
 
 import board_texture
 import percent_display
 import range_selector
-import eval7.range_string
+import eval7
 import saved_ranges
 
 
-class MainWindow(QtGui.QWidget):
+class MainWindow(QtWidgets.QWidget):
     """The Main Window of the Application."""
 
     def __init__(self):
@@ -37,7 +37,7 @@ class MainWindow(QtGui.QWidget):
         # Build the window UI and show it.
         self.setWindowTitle("Flop Ferret")
 
-        main_layout = QtGui.QVBoxLayout(self)
+        main_layout = QtWidgets.QVBoxLayout(self)
         input_layout = self.make_input_layout()
         output_layout = self.make_output_layout()
 
@@ -45,24 +45,24 @@ class MainWindow(QtGui.QWidget):
         main_layout.addLayout(output_layout)
 
         self.setLayout(main_layout)
-        QtGui.QShortcut(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Q),
+        QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Q),
                         self, QtCore.SLOT("close()"))
         self.show()
 
     def make_input_layout(self):
         # Build the layout for the inputs.
-        self.range_input = QtGui.QLineEdit()
+        self.range_input = QtWidgets.QLineEdit()
         self.range_validator = RangeValidator()
         self.range_validator.saved_ranges = saved_ranges.load()
         self.range_input.setValidator(self.range_validator)
-        self.board_input = QtGui.QLineEdit()
+        self.board_input = QtWidgets.QLineEdit()
         self.board_input.setValidator(BoardValidator())
         self.board_input.setMaximumWidth(100)
-        set_range_button = QtGui.QPushButton("Set Range")
+        set_range_button = QtWidgets.QPushButton("Set Range")
         set_range_button.clicked.connect(self.set_range)
-        board_label = QtGui.QLabel("Board")
+        board_label = QtWidgets.QLabel("Board")
 
-        layout = QtGui.QGridLayout()
+        layout = QtWidgets.QGridLayout()
         layout.addWidget(set_range_button, 0, 0)
         layout.addWidget(self.range_input, 0, 1)
         layout.addWidget(board_label, 1, 0)
@@ -75,33 +75,33 @@ class MainWindow(QtGui.QWidget):
 
     def make_output_layout(self):
         # Build the layout for the outputs.
-        layout = QtGui.QGridLayout()
+        layout = QtWidgets.QGridLayout()
         # Store a dictionary of PercentDisplay outputs for easy update.
         self.outputs = {}
-        for name, probability in self.board_texture.iteritems():
+        for name, probability in self.board_texture.items():
             output = percent_display.PercentDisplayWidget(
                 probability, max_bar_width=100, color="#00BED4"
             )
             self.outputs[name] = output
 
         def add_output(name, row, column):
-            label = QtGui.QLabel(name)
+            label = QtWidgets.QLabel(name)
             label.setContentsMargins(30, 0, 0, 0)
             layout.addWidget(label, row, column)
             layout.addWidget(self.outputs[name], row, column+1)
 
         # Add base hand type outputs to layout
-        hand_type_label = QtGui.QLabel("<b>Hand Type Breakdown</b>")
+        hand_type_label = QtWidgets.QLabel("<b>Hand Type Breakdown</b>")
         layout.addWidget(hand_type_label, 0, 0, 1, 2)
         for i, name in enumerate(board_texture.hand_types):
             add_output(name, i+1, 0)
         # Add pair breakdown outputs
-        pair_label = QtGui.QLabel("<b>Pair Breakdown</b>")
+        pair_label = QtWidgets.QLabel("<b>Pair Breakdown</b>")
         layout.addWidget(pair_label, 0, 2, 1, 2)
         for i, name in enumerate(board_texture.pair_types):
             add_output(name, i+1, 2)
         # Add draw breakdown outputs
-        draw_label = QtGui.QLabel("<b>Draw Breakdown</b>")
+        draw_label = QtWidgets.QLabel("<b>Draw Breakdown</b>")
         layout.addWidget(draw_label, i+2, 2, 1, 2)
         for j, name in enumerate(board_texture.draw_types):
             add_output(name, i+j+3, 2)
@@ -146,7 +146,7 @@ class MainWindow(QtGui.QWidget):
         board_string = self.board_input.text().replace(" ", "")
         board = [board_string[i:i+2] for i in range(0, len(board_string)-1, 2)]
         self.board_texture.calculate(range_string, board)
-        for key, output in self.outputs.iteritems():
+        for key, output in self.outputs.items():
             output.setValue(self.board_texture[key])
 
 
@@ -154,7 +154,7 @@ class RangeValidator(QtGui.QValidator):
     """Validator for range input."""
 
     def validate(self, s, pos):
-        if eval7.range_string.validate_string(s):
+        if eval7.rangestring.validate_string(s):
             # Replace tags with saved ranges.
             tags = s.split('#')[1::2]
             for tag in tags:
@@ -169,7 +169,7 @@ class RangeValidator(QtGui.QValidator):
                 if c == '#':
                     # A parseable string always has properly completed tags.
                     in_tag = not in_tag
-                if not in_tag and c in ''.join(eval7.range_string.ranks).lower():
+                if not in_tag and c in ''.join(eval7.rangestring.ranks).lower():
                     c = c.upper()
                 new_s += c
             return [QtGui.QValidator.Acceptable, new_s, pos]
@@ -180,9 +180,9 @@ class RangeValidator(QtGui.QValidator):
 
 class BoardValidator(QtGui.QRegExpValidator):
     """Validator for board input."""
-    _rank_str = ''.join(eval7.range_string.ranks) + \
-                ''.join(eval7.range_string.ranks).lower()
-    _suit_str = ''.join(eval7.range_string.suits)
+    _rank_str = ''.join(eval7.rangestring.ranks) + \
+                ''.join(eval7.rangestring.ranks).lower()
+    _suit_str = ''.join(eval7.rangestring.suits)
     # A card is a rank and a suit.
     _card_re_str = "[{}][{}]".format(_rank_str, _suit_str)
     # A board is 3-5 cards, optionally with spaces between them.

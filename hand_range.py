@@ -15,7 +15,6 @@
 
 
 import eval7
-import eval7.range_string
 
 
 class HandRange(dict):
@@ -29,7 +28,7 @@ class HandRange(dict):
 
     def _from_str(self, range_string):
         # Load range from range-string.
-        hand_str_list = eval7.range_string.string_to_hands(range_string)
+        hand_str_list = eval7.rangestring.string_to_hands(range_string)
         for hand, weight in hand_str_list:
             self[hand] += weight
         self.normalize()
@@ -46,7 +45,7 @@ class HandRange(dict):
         total = sum(self.values())
         if not total == 0.0:
             N = 1.0/total
-            for hand, weight in self.iteritems():
+            for hand, weight in self.items():
                 self[hand] = weight*N
         return total
 

@@ -13,10 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 
-from PySide import QtGui
+from PySide2 import QtGui, QtWidgets
 
 
-class PercentDisplayWidget(QtGui.QWidget):
+class PercentDisplayWidget(QtWidgets.QWidget):
     """A simple percentage display widget with a bar and numerical label.
 
     usage: wid = PercentDisplayWidget()
@@ -31,10 +31,10 @@ class PercentDisplayWidget(QtGui.QWidget):
         self.initUI()
 
     def initUI(self):
-        layout = QtGui.QHBoxLayout()
+        layout = QtWidgets.QHBoxLayout()
         layout.setContentsMargins(11, 0, 11, 0)
-        self.spacer = QtGui.QSpacerItem(0, 0)
-        self.label = QtGui.QLabel()
+        self.spacer = QtWidgets.QSpacerItem(0, 0)
+        self.label = QtWidgets.QLabel()
         layout.addSpacerItem(self.spacer)
         layout.addWidget(self.label)
         self.setLayout(layout)

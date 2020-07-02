@@ -40,16 +40,16 @@ class BoardTexture(dict):
         """Calculate the probabilities of each hand type."""
         for key in hand_types + draw_types + pair_types:
             self[key] = 0.0
-        board = map(eval7.Card, board_card_strings)
+        board = list(map(eval7.Card, board_card_strings))
         hr = hand_range.HandRange(hand_range_string)
         hr.exclude_cards(board)
         if len(board) < 3:
             raise ValueError("Not enough cards in board!")
-        for hand, prob in hr.iteritems():
+        for hand, prob in hr.items():
             if not prob == 0.0:
                 cards = board + list(hand)
                 result = eval7.evaluate(cards)
-                hand_type = eval7.hand_type(result)
+                hand_type = eval7.handtype(result)
                 self[hand_type] += prob
                 if len(cards) < 7 and hand_types.index(hand_type) < 5:
                     # No flush or better, so there may be draws.
