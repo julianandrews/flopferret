@@ -18,7 +18,8 @@
 from PySide2 import QtGui, QtCore, QtWidgets
 
 import eval7
-import saved_ranges
+
+from . import saved_ranges
 
 
 class RangeSelector(QtWidgets.QDialog):

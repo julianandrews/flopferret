@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 
 import eval7
-import hand_range
+
+from . import hand_range
 
 hand_types = [
     "High Card",

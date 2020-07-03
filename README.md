@@ -6,17 +6,25 @@ Installation
 ------------
 
 ### Windows
-Download the most recent release [here](https://github.com/JulianAndrews/flopferret/releases).
+Download the release [here](https://github.com/JulianAndrews/flopferret/releases).
 
-### Linux/OS X
-Installation is currently largely manual. You'll need Python 2.6 or 2.7 and Cython. First get [pyEval7](https://github.com/JulianAndrews/pyeval7). After downloading the repo, install pyEval7 with:
+### Debian/Ubuntu with Python 3.7
 
-    python setup.py install
- 
-or for single-user installation:
+    sudo apt-get install python3-pip
+    python3 -m pip install --user flopferret
 
-    python setup.py install --user
+Assuming normal defaults, the executable should be at `~/.local/bin/flopferret`
 
-You will also need to install the `pyparsing` and `pyside` modules. Both of these modules and Cython are available via `easy_install` or `pip`, and also as packages in the Ubuntu repos.
+### Other versions of Linux
 
-OS X installation is untested, but theoretically should work. Let me know if you have any questions/comments!
+Installation is currently largely manual. First install
+[pyEval7](https://github.com/JulianAndrews/pyeval7), and
+[PySide2](https://pypi.org/project/PySide2/). Once you have those installed,
+the instructions for Debian/Ubuntu should work.
+
+### MacOS
+
+Currently MacOS is unsupported. There's a chance it could be made to work
+without too much effort though, so if you'd like to see flopferret working on
+MacOS show your interest
+[here](https://github.com/julianandrews/flopferret/issues/9)

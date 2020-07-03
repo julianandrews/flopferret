@@ -12,7 +12,14 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-import flopferret
+import sys
 
-if __name__ == "__main__":
-    flopferret.main()
+from PySide2 import QtWidgets
+
+from . import main_window
+
+def main():
+    app = QtWidgets.QApplication(sys.argv)
+    wid = main_window.MainWindow()
+
+    sys.exit(app.exec_())

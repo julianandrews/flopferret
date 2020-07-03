@@ -16,12 +16,12 @@
 """Main Board Texture Analyzer Gui"""
 
 from PySide2 import QtCore, QtGui, QtWidgets
-
-import board_texture
-import percent_display
-import range_selector
 import eval7
-import saved_ranges
+
+from . import board_texture
+from . import percent_display
+from . import range_selector
+from . import saved_ranges
 
 
 class MainWindow(QtWidgets.QWidget):
