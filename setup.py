@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='flopferret',
-    version='0.1.1',
+    version='0.1.2',
     description='A poker range ',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -25,5 +25,5 @@ setup(
     entry_points={
         'gui_scripts': ['flopferret=flopferret:main']
     },
-    install_requires=['pyxdg', 'eval7>=0.0.1.5', 'pyside2'],
+    install_requires=['pyxdg', 'eval7>=0.1.6', 'pyside2'],
 )
