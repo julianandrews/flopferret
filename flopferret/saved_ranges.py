@@ -22,8 +22,12 @@ import sys
 if sys.platform.startswith('linux'):
     import xdg.BaseDirectory
     data_dir = xdg.BaseDirectory.xdg_data_home
+elif sys.platform == 'darwin':
+    data_dir = os.path.expanduser('~/Library/Application Support')
 elif sys.platform == 'win32':
     data_dir = os.getenv('APPDATA')
+else:
+    raise RuntimeError("Unsupported OS")
 
 config_dir = os.path.join(data_dir, "flopferret")
 config_filename = os.path.join(config_dir, "hand_ranges.json")
