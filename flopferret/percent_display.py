@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 
-from PySide2 import QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 
 
 class PercentDisplayWidget(QtWidgets.QWidget):
@@ -43,6 +43,8 @@ class PercentDisplayWidget(QtWidgets.QWidget):
 
     def setValue(self, value):
         """Set the value to display (0 <= value <= 1)."""
+        # Float precision errors can lead to values greater than 1.
+        value = round(value, 4)
         if value < 0 or value > 1:
             raise ValueError('Only values between 0 and 1 are supported')
         self.value = value

@@ -8,7 +8,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 setup(
     name='flopferret',
     version='0.1.3',
-    description='A poker range ',
+    description='A Texas Hold\'em board texture analyzer',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/JulianAndrews/pyeval7',
@@ -25,5 +25,5 @@ setup(
     entry_points={
         'gui_scripts': ['flopferret=flopferret:main']
     },
-    install_requires=['pyxdg', 'eval7>=0.1.6', 'pyside2'],
+    install_requires=['pyxdg', 'eval7>=0.1.6', 'PyQt5'],
 )

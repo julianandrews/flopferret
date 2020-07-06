@@ -15,7 +15,7 @@
 
 """A Range selector widget for Hold'em hand ranges."""
 
-from PySide2 import QtGui, QtCore, QtWidgets
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 import eval7
 
@@ -281,8 +281,9 @@ class RangeSelectorButton(QtWidgets.QPushButton):
 
     _colors = {'s': "#98F098", 'o': "#FF9898", '': "#9898F0"}
     _selected_colors = {'s': "#D8FFD8", 'o': "#FFD8D8", '': "#D8D8FF"}
-    _weight_colors = ["#404040", "#F06000", "#800080", "#0060D0"]
-    _weight_pos = [4, 8, 25, 29]
+    _weight_colors = (QtGui.QColor("#404040"), QtGui.QColor("#F06000"),
+                      QtGui.QColor("#800080"), QtGui.QColor("#0060D0"))
+    _weight_pos = (4, 8, 25, 29)
     _style = """
     QPushButton {{
         color: black;
@@ -355,4 +356,4 @@ class SingleHandListValidator(QtGui.QRegExpValidator):
                     s = s.replace(hand, normalized)
             except eval7.rangestring.RangeStringError:
                 result = QtGui.QValidator.Invalid
-        return [result, s, pos]
+        return (result, s, pos)

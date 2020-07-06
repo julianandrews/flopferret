@@ -25,9 +25,8 @@ instead, or better yet, installing in a virtualenv and launching with a script.
 
 `flopferret` can be made to to work in Python 3.5+, but you'll have to compile
 some parts manually. First install
-[pyEval7](https://github.com/JulianAndrews/pyeval7), and
-[PySide2](https://pypi.org/project/PySide2/). Once you have those installed,
-the instructions for Debian/Ubuntu should work.
+[pyEval7](https://github.com/JulianAndrews/pyeval7).  Once you have that
+installed, the instructions for Debian/Ubuntu should work.
 
 With some minor code changes, `flopferret` can be made to work on Python 2.6+,
 but distribution and compilation is a pain, and I don't have the time to

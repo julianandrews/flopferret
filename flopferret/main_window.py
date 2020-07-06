@@ -15,7 +15,7 @@
 
 """Main Board Texture Analyzer Gui"""
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 import eval7
 
 from . import board_texture
@@ -45,8 +45,9 @@ class MainWindow(QtWidgets.QWidget):
         main_layout.addLayout(output_layout)
 
         self.setLayout(main_layout)
-        QtWidgets.QShortcut(QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_Q),
-                        self, QtCore.SLOT("close()"))
+        QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+Q"), self
+        ).activated.connect(self.close)
         self.show()
 
     def make_input_layout(self):
@@ -172,10 +173,11 @@ class RangeValidator(QtGui.QValidator):
                 if not in_tag and c in ''.join(eval7.rangestring.ranks).lower():
                     c = c.upper()
                 new_s += c
-            return [QtGui.QValidator.Acceptable, new_s, pos]
+            return (QtGui.QValidator.Acceptable, new_s, pos)
         else:
             # Accept any other input as intermediate.
-            return [QtGui.QValidator.Intermediate, s, pos]
+            return (QtGui.QValidator.Intermediate, s, pos)
+        return (QtGui.QValidator.Intermediate, s, pos)
 
 
 class BoardValidator(QtGui.QRegExpValidator):
@@ -224,4 +226,4 @@ class BoardValidator(QtGui.QRegExpValidator):
                 stripped_pos = len(s[:new_pos].replace(' ', ''))
                 new_pos = stripped_pos + (stripped_pos - 1)//2
                 s = ' '.join(card_strings)
-        return [result, s, new_pos]
+        return (result, s, new_pos)

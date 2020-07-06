@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 import sys
 
-from PySide2 import QtWidgets
+from PyQt5 import QtWidgets
 
 from . import main_window
 
