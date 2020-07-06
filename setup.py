@@ -7,7 +7,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='flopferret',
-    version='0.1.3',
+    version='0.1.4',
     description='A Texas Hold\'em board texture analyzer',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -17,7 +17,9 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Games/Entertainment',
     ],
     keywords='poker equity',

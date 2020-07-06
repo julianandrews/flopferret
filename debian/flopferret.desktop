@@ -1,0 +1,8 @@
+[Desktop Entry]
+Version=0.1.4
+Exec=flopferret
+Type=Application
+Categories=Game
+Name=Flop Ferret
+Icon=flopferret.svg
+Comment=Poker board texture analyzer

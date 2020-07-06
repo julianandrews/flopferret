@@ -1,0 +1,12 @@
+Source: flopferret
+Section: python
+Maintainer: Julian Andrews <jandrews271@gmail.com>
+Build-Depends: debhelper (>= 9),python3, dh-virtualenv (>= 1.0),
+    python3-setuptools, python3-pip, python3-dev
+Standards-Version: 3.9.5
+
+Package: flopferret
+Architecture: any
+Pre-Depends: dpkg (>= 1.16.1), python3.7-minimal, ${misc:Pre-Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}, libgl1-mesa-glx, libqt5gui5
+Description: A Texas Hold'em board texture analyzer.
