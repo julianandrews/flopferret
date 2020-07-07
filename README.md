@@ -5,12 +5,21 @@ Texas Hold'em board texture analyzer.
 Installation
 ------------
 
+### Debian with Python 3.7, Ubuntu with Python 3.6, MacoOS
+
+Download the the latest release [here](https://github.com/JulianAndrews/flopferret/releases).
+
+For Ubuntu you'll need a version with a Python 3.6 package, and for Debian
+Python 3.7. The MacOS install includes a bundled python interpreter.
+
 ### Windows
-Download the release [here](https://github.com/JulianAndrews/flopferret/releases).
 
-### Python 3.7 or 3.8 on Linux or MacOS
+Download the Alpha release
+[here](https://github.com/julianandrews/flopferret/releases/tag/v0.1-alpha).
 
-Make sure you have pip installed for python3.7 or python3.8 (`pip --version`
+### Other versions of Linux
+
+Make sure you have pip installed for Python 3.6, 3.7, or 3.8 `pip --version`
 should let you know). Then:
 
     pip install flopferret
@@ -19,15 +28,5 @@ should be all you need. On Linux systems I recommend
 
     pip install --user flopferret
 
-instead, or better yet, installing in a virtualenv and launching with a script.
-
-### Other versions of Python
-
-`flopferret` can be made to to work in Python 3.5+, but you'll have to compile
-some parts manually. First install
-[pyEval7](https://github.com/JulianAndrews/pyeval7).  Once you have that
-installed, the instructions for Debian/Ubuntu should work.
-
-With some minor code changes, `flopferret` can be made to work on Python 2.6+,
-but distribution and compilation is a pain, and I don't have the time to
-maintain that!
+Better yet, install it in a virtualenv, and link the `flopferret` binary to
+somewhere on your path.
