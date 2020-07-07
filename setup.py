@@ -6,6 +6,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
+    app=['__main__.py'],
     name='flopferret',
     version='0.1.4',
     description='A Texas Hold\'em board texture analyzer',
@@ -28,4 +29,8 @@ setup(
         'gui_scripts': ['flopferret=flopferret:main']
     },
     install_requires=['pyxdg', 'eval7>=0.1.6', 'PyQt5'],
+    options={'py2app': {
+        'iconfile': 'macos/flopferret.icns',
+        'packages': 'PyQt5,eval7',
+    }},
 )
