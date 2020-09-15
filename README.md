@@ -2,6 +2,8 @@ FlopFerret
 ==========
 Texas Hold'em board texture analyzer.
 
+![Screenshot](screenshot.jpg)
+
 Installation
 ------------
 
